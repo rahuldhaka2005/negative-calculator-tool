@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Negative Marking Calculator with Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899, #f97316);
+            transition: background 0.5s;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1e3a8a, #6b21a8, #9f1239);
+            color: #f3f4f6;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .dark-mode .container {
+            background: rgba(17, 24, 39, 0.95);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        }
+        #homepage {
+            position: relative;
+            overflow: hidden;
+        }
+        #homepage::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            animation: pulse 6s infinite;
+            z-index: 0;
+        }
+        #homepage > * {
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-size: 36px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .dark-mode h1 {
+            color: #f3f4f6;
+        }
+        p {
+            text-align: center;
+            color: #4b5563;
+            margin-bottom: 25px;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        .dark-mode p {
+            color: #d1d5db;
+        }
+        .input-group {
+            margin: 15px 0;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        .dark-mode label {
+            color: #d1d5db;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+            outline: none;
+        }
+        .dark-mode input {
+            background: #1f2937;
+            border-color: #374151;
+            color: #f3f4f6;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        button:hover {
+            background: #059669;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(5, 150, 105, 0.4);
+        }
+        #homepage button {
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+        }
+        #homepage button:hover {
+            background: linear-gradient(90deg, #7c3aed, #db2777);
+        }
+        #resetBtn {
+            background: #ef4444;
+            margin-top: 10px;
+        }
+        #resetBtn:hover {
+            background: #dc2626;
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
+        }
+        #backBtn {
+            background: #f59e0b;
+            margin-left: 10px;
+        }
+        #backBtn:hover {
+            background: #d97706;
+            box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
+        }
+        #result, #history, #chartContainer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 16px;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+        .dark-mode #result, .dark-mode #history, .dark-mode #chartContainer {
+            background: #1f2937;
+            color: #f3f4f6;
+        }
+        canvas {
+            max-width: 100%;
+        }
+        .ad-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            text-align: center;
+            transition: opacity 0.5s ease;
+        }
+        .ad-container:hover {
+            opacity: 0.9;
+        }
+        .dark-mode .ad-container {
+            background: #374151;
+        }
+        .toggle-container {
+            text-align: right;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        #darkModeToggle {
+            padding: 8px 16px;
+            background: #e5e7eb;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        #darkModeToggle:hover {
+            background: #d1d5db;
+        }
+        .dark-mode #darkModeToggle {
+            background: #374151;
+            color: #f3f4f6;
+        }
+        .dark-mode #darkModeToggle:hover {
+            background: #4b5563;
+        }
+        .hidden {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Homepage Section -->
+        <div id="homepage">
+            <h1>ScoreMaster</h1>
+            <p>Unlock the power of precision with our advanced negative marking calculator. Visualize your performance with stunning charts and optimize your exam strategy effortlessly.</p>
+            
+            <!-- AdMob Banner Ad Unit 1 (Homepage Top) -->
+            <div class="ad-container" id="admob-home-top">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:320px;height:50px"
+                     data-ad-client="ca-app-pub-3940256099942544"
+                     data-ad-slot="6300978111"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <button onclick="showCalculator()">Launch Calculator</button>
+        </div>
+
+        <!-- Calculator Section -->
+        <div id="calculator" class="hidden">
+            <div class="toggle-container">
+                <button id="darkModeToggle" onclick="toggleDarkMode()">Dark Mode</button>
+                <button id="backBtn" onclick="showHomepage()">Back to Home</button>
+            </div>
+            <h1>Negative Marking Calculator</h1>
+
+            <!-- AdMob Banner Ad Unit 2 (Calculator Top) -->
+            <div class="ad-container" id="admob-calc-top">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:320px;height:50px"
+                     data-ad-client="ca-app-pub-3940256099942544"
+                     data-ad-slot="6300978111"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <div class="input-group">
+                <label for="totalQuestions">Total Questions:</label>
+                <input type="number" id="totalQuestions" min="0" placeholder="Enter total questions">
+            </div>
+            <div class="input-group">
+                <label for="correct">Correct Answers:</label>
+                <input type="number" id="correct" min="0" placeholder="Enter correct answers">
+            </div>
+            <div class="input-group">
+                <label for="wrong">Wrong Answers:</label>
+                <input type="number" id="wrong" min="0" placeholder="Enter wrong answers">
+            </div>
+            <div class="input-group">
+                <label for="marksPerCorrect">Marks per Correct Answer:</label>
+                <input type="number" id="marksPerCorrect" min="0" step="0.1" placeholder="e.g., 4">
+            </div>
+            <div class="input-group">
+                <label for="negativeMarks">Negative Marks per Wrong Answer:</label>
+                <input type="number" id="negativeMarks" min="0" step="0.1" placeholder="e.g., 1">
+            </div>
+
+            <button onclick="calculateScore()">Calculate Score</button>
+            <button id="resetBtn" onclick="resetForm()">Reset</button>
+            <div id="result" class="fade-in"></div>
+            <div id="chartContainer" class="fade-in">
+                <canvas id="scoreChart"></canvas>
+            </div>
+            <div id="history" class="fade-in"></div>
+
+            <!-- AdMob Banner Ad Unit 3 (Calculator Bottom) -->
+            <div class="ad-container" id="admob-calc-bottom">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:320px;height:50px"
+                     data-ad-client="ca-app-pub-3940256099942544"
+                     data-ad-slot="6300978111"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AdMob Initialization
+        (function() {
+            var admobScript = document.createElement('script');
+            admobScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+            admobScript.async = true;
+            document.head.appendChild(admobScript);
+        })();
+
+        // Page Navigation
+        const homepage = document.getElementById('homepage');
+        const calculator = document.getElementById('calculator');
+        let history = [];
+        let scoreChart;
+
+        function showCalculator() {
+            homepage.classList.add('hidden');
+            calculator.classList.remove('hidden');
+        }
+
+        function showHomepage() {
+            calculator.classList.add('hidden');
+            homepage.classList.remove('hidden');
+            document.getElementById('result').innerHTML = '';
+            if (scoreChart) scoreChart.destroy();
+        }
+
+        // Calculator Logic with Chart
+        function calculateScore() {
+            const totalQuestions = parseInt(document.getElementById('totalQuestions').value) || 0;
+            const correct = parseInt(document.getElementById('correct').value) || 0;
+            const wrong = parseInt(document.getElementById('wrong').value) || 0;
+            const marksPerCorrect = parseFloat(document.getElementById('marksPerCorrect').value) || 0;
+            const negativeMarks = parseFloat(document.getElementById('negativeMarks').value) || 0;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.remove('fade-in');
+            void resultDiv.offsetWidth;
+
+            if (totalQuestions === 0 || marksPerCorrect === 0) {
+                resultDiv.innerHTML = "Error: Total Questions and Marks per Correct must be greater than 0!";
+                resultDiv.classList.add('fade-in');
+                return;
+            }
+            if (correct + wrong > totalQuestions) {
+                resultDiv.innerHTML = "Error: Correct + Wrong answers cannot exceed Total Questions!";
+                resultDiv.classList.add('fade-in');
+                return;
+            }
+
+            const positiveScore = correct * marksPerCorrect;
+            const negativeScore = wrong * negativeMarks;
+            const totalScore = positiveScore - negativeScore;
+            const unanswered = totalQuestions - (correct + wrong);
+
+            resultDiv.innerHTML = `
+                <strong>Total Score:</strong> ${totalScore.toFixed(2)}<br>
+                <strong>Positive Score:</strong> ${positiveScore.toFixed(2)}<br>
+                <strong>Negative Score:</strong> -${negativeScore.toFixed(2)}<br>
+                <strong>Unanswered Questions:</strong> ${unanswered}
+            `;
+            resultDiv.classList.add('fade-in');
+
+            // Calculate percentages
+            const correctPercent = (correct / totalQuestions) * 100 || 0;
+            const wrongPercent = (wrong / totalQuestions) * 100 || 0;
+            const unansweredPercent = (unanswered / totalQuestions) * 100 || 0;
+
+            // Create or update chart
+            if (scoreChart) scoreChart.destroy();
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            scoreChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correct (%)', 'Wrong (%)', 'Unanswered (%)'],
+                    datasets: [{
+                        data: [correctPercent, wrongPercent, unansweredPercent],
+                        backgroundColor: ['#10b981', '#ef4444', '#6b7280'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: document.body.classList.contains('dark-mode') ? '#f3f4f6' : '#1f2937'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw.toFixed(2)}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Add to history
+            history.push(totalScore.toFixed(2));
+            updateHistory();
+        }
+
+        function resetForm() {
+            document.getElementById('totalQuestions').value = '';
+            document.getElementById('correct').value = '';
+            document.getElementById('wrong').value = '';
+            document.getElementById('marksPerCorrect').value = '';
+            document.getElementById('negativeMarks').value = '';
+            document.getElementById('result').innerHTML = '';
+            if (scoreChart) scoreChart.destroy();
+        }
+
+        function updateHistory() {
+            const historyDiv = document.getElementById('history');
+            historyDiv.innerHTML = '<strong>Score History:</strong><br>' + 
+                (history.length > 0 ? history.map((score, index) => `${index + 1}. ${score}`).join('<br>') : 'No scores yet.');
+            historyDiv.classList.add('fade-in');
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const toggleButton = document.getElementById('darkModeToggle');
+            toggleButton.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+            if (scoreChart) {
+                scoreChart.options.plugins.legend.labels.color = document.body.classList.contains('dark-mode') ? '#f3f4f6' : '#1f2937';
+                scoreChart.update();
+            }
+        }
+
+        // Keyboard Support
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !calculator.classList.contains('hidden')) {
+                calculateScore();
+            }
+        });
+    </script>
+</body>
+</html>
